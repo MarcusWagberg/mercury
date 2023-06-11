@@ -1,0 +1,18 @@
+.{
+    .name = "mercury",
+    .version = "0.0.1",
+
+    .dependencies = .{
+        // zig-clap 12201b9998ae15edcf8f348e69531d650ad4983a94f442d3c228f4171a62e8ec8bf2
+        .clap = .{
+            .url = "https://github.com/Hejsil/zig-clap/archive/05a50fe7fe833059db8550c34bc69fedd8bb0af8.tar.gz",
+            .hash = "12201b9998ae15edcf8f348e69531d650ad4983a94f442d3c228f4171a62e8ec8bf2",
+        },
+
+        // zap v0.1.6-pre
+        .zap = .{
+            .url = "https://github.com/zigzap/zap/archive/refs/tags/v0.1.6-pre.tar.gz",
+            .hash = "1220a3eab193523b30721dae56a763468b7348b3d1f0b3364d68f6d548c753a72c5a",
+        },
+    },
+}
