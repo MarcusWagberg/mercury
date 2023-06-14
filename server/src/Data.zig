@@ -147,7 +147,7 @@ fn Store(comptime T: type) type {
                     };
                 },
                 else => {
-                    log.err("failed to open file '{s}' with: '{any}'", .{ file_path, err });
+                    log.err("failed to access file '{s}' with: '{any}'", .{ file_path, err });
                     return err;
                 },
             };
