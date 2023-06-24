@@ -525,9 +525,9 @@ fn Store(comptime T: type) type {
                 log.err("failed to parse json from file '{s}' with: '{any}'", .{ file_path, err });
                 return err;
             };
-            defer std.json.parseFree([]Entry, alloc, entries);
+            defer entries.deinit();
 
-            for (entries) |entry| {
+            for (entries.value) |entry| {
                 const new_data = entry.data.copy(alloc) orelse {
                     log.err("allocation failed!", .{});
                     return error.OutOfMemory;

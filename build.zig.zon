@@ -3,16 +3,16 @@
     .version = "0.0.1",
 
     .dependencies = .{
-        // zig-clap 12201b9998ae15edcf8f348e69531d650ad4983a94f442d3c228f4171a62e8ec8bf2
+        // zig-clap 3d78af4b000758abe6c6761cbf61f5a66abe4f10
         .clap = .{
-            .url = "https://github.com/Hejsil/zig-clap/archive/05a50fe7fe833059db8550c34bc69fedd8bb0af8.tar.gz",
-            .hash = "12201b9998ae15edcf8f348e69531d650ad4983a94f442d3c228f4171a62e8ec8bf2",
+            .url = "https://github.com/Hejsil/zig-clap/archive/3d78af4b000758abe6c6761cbf61f5a66abe4f10.tar.gz",
+            .hash = "1220ae43eccd3940d287e9e62bf84897040d0cc9e82c970b59c5703d7fd733d0213f",
         },
 
-        // zap v0.1.6-pre
+        // zap v0.1.7-pre
         .zap = .{
-            .url = "https://github.com/zigzap/zap/archive/refs/tags/v0.1.6-pre.tar.gz",
-            .hash = "1220a3eab193523b30721dae56a763468b7348b3d1f0b3364d68f6d548c753a72c5a",
+            .url = "https://github.com/zigzap/zap/archive/refs/tags/v0.1.7-pre.tar.gz",
+            .hash = "1220002d24d73672fe8b1e39717c0671598acc8ec27b8af2e1caf623a4fd0ce0d1bd",
         },
     },
 }
