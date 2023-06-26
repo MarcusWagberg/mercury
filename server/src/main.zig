@@ -3,8 +3,6 @@ const zap = @import("zap");
 const clap = @import("clap");
 const log = std.log;
 
-const me = @import("mercury_error.zig");
-
 const Data = @import("Data.zig");
 
 const DEFAULT_INTERFACE: []const u8 = "127.0.0.1";
@@ -26,14 +24,14 @@ pub fn main() u8 {
 
     var diag = clap.Diagnostic{};
     var res = clap.parse(clap.Help, &params, clap.parsers.default, .{ .diagnostic = &diag }) catch |err| {
-        diag.report(stderr, err) catch return me.stderr_error();
+        diag.report(stderr, err) catch return stderr_error();
         return 1;
     };
     defer res.deinit();
 
     if (res.args.help != 0) {
-        stderr.print("Usage: mercury\n", .{}) catch return me.stderr_error();
-        clap.help(stderr, clap.Help, &params, .{}) catch return me.stderr_error();
+        stderr.print("Usage: mercury\n", .{}) catch return stderr_error();
+        clap.help(stderr, clap.Help, &params, .{}) catch return stderr_error();
         return 0;
     }
 
@@ -43,7 +41,7 @@ pub fn main() u8 {
     };
     const alloc = gpa.allocator();
 
-    const interface: [:0]const u8 = alloc.dupeZ(u8, if (res.args.interface) |int| int else DEFAULT_INTERFACE) catch return me.alloc_error();
+    const interface: [:0]const u8 = alloc.dupeZ(u8, if (res.args.interface) |int| int else DEFAULT_INTERFACE) catch return alloc_error();
     defer alloc.free(interface);
 
     const port = res.args.port orelse DEFAULT_PORT;
@@ -74,6 +72,16 @@ pub fn main() u8 {
     return 0;
 }
 
+pub fn stderr_error() u8 {
+    log.err("failed to output to stderr!", .{});
+    return 1;
+}
+
+pub fn alloc_error() u8 {
+    log.err("allocation failed!", .{});
+    return 1;
+}
+
 fn on_request(r: zap.SimpleRequest) void {
     log.info("{s}{s}{s}{s}{s}", .{
         r.method orelse "",
@@ -84,36 +92,25 @@ fn on_request(r: zap.SimpleRequest) void {
     });
     defer log.info("RESP {d}", .{r.h.*.status});
 
-    //r.sendBody("<html><body><h1>Hello from MERCURY!!!</h1></body></html>") catch return;
+    //r.sendBody("<html><body><h1>Hello from MERCURY!!!</h1></body></html>") catch return;s
 
-    const l_groups = mercury_data.group_store.list();
-    if (l_groups.isError()) {
-        const html = std.fmt.allocPrint(mercury_data.alloc, "<html><body><h1>ERROR: {s}</h1></body></html>", .{l_groups.getErrorMsg()}) catch return;
-        defer mercury_data.alloc.free(html);
-        r.sendBody(html) catch return;
-        log.err("{s}", .{l_groups.getErrorMsg()});
-        return;
-    }
-    defer l_groups.ok.free(mercury_data.alloc);
+    var groups = mercury_data.group_store.list(mercury_data.alloc) catch return;
+    defer groups.free();
 
-    const l_files = mercury_data.file_store.list();
-    if (l_files.isError()) {
-        const html = std.fmt.allocPrint(mercury_data.alloc, "<html><body><h1>ERROR: {s}</h1></body></html>", .{l_files.getErrorMsg()}) catch return;
-        defer mercury_data.alloc.free(html);
-        r.sendBody(html) catch return;
-        log.err("{s}", .{l_files.getErrorMsg()});
-        return;
-    }
-    defer l_files.ok.free(mercury_data.alloc);
+    var files = mercury_data.file_store.list(mercury_data.alloc) catch return;
+    defer files.free();
 
     const ReturnJson = struct {
-        groups: []Data.GroupStore.Entry,
-        files: []Data.FileStore.Entry,
+        groups: []Data.GroupStore.LatestEntry,
+        files: []Data.FileStore.LatestEntry,
     };
     const ret_json = ReturnJson{
-        .groups = l_groups.ok.slice,
-        .files = l_files.ok.slice,
+        .groups = groups.entries,
+        .files = files.entries,
     };
 
-    r.sendJson(std.json.stringifyAlloc(mercury_data.alloc, ret_json, .{}) catch return) catch return;
+    const json = std.json.stringifyAlloc(mercury_data.alloc, ret_json, .{}) catch return;
+    defer mercury_data.alloc.free(json);
+
+    r.sendJson(json) catch return;
 }
