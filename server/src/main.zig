@@ -3,13 +3,13 @@ const zap = @import("zap");
 const clap = @import("clap");
 const log = std.log;
 
-const Data = @import("Data.zig");
+const State = @import("State.zig");
 
 const DEFAULT_INTERFACE: []const u8 = "127.0.0.1";
 const DEFAULT_PORT: usize = 3000;
 const DEFAULT_DATA_DIR: []const u8 = "data";
 
-var mercury_data: Data = undefined;
+var mercury_state: State = undefined;
 
 pub fn main() u8 {
     const stderr = std.io.getStdErr().writer();
@@ -46,10 +46,10 @@ pub fn main() u8 {
 
     const port = res.args.port orelse DEFAULT_PORT;
 
-    mercury_data = Data.init(alloc, res.args.data orelse DEFAULT_DATA_DIR) catch return 1;
-    defer mercury_data.deinit();
+    mercury_state = State.init(alloc, res.args.data orelse DEFAULT_DATA_DIR) catch return 1;
+    defer mercury_state.deinit();
 
-    log.info("starting mercury with data path: {s}", .{mercury_data.data_path});
+    log.info("starting mercury with data path: {s}", .{mercury_state.data_path});
 
     var listener = zap.SimpleHttpListener.init(.{
         .port = port,
@@ -94,23 +94,23 @@ fn on_request(r: zap.SimpleRequest) void {
 
     //r.sendBody("<html><body><h1>Hello from MERCURY!!!</h1></body></html>") catch return;s
 
-    var groups = mercury_data.group_store.list(mercury_data.alloc) catch return;
+    var groups = mercury_state.group_store.list(mercury_state.alloc) catch return;
     defer groups.free();
 
-    var files = mercury_data.file_store.list(mercury_data.alloc) catch return;
+    var files = mercury_state.file_store.list(mercury_state.alloc) catch return;
     defer files.free();
 
     const ReturnJson = struct {
-        groups: []Data.GroupStore.LatestEntry,
-        files: []Data.FileStore.LatestEntry,
+        groups: []State.GroupStore.LatestEntry,
+        files: []State.FileStore.LatestEntry,
     };
     const ret_json = ReturnJson{
         .groups = groups.entries,
         .files = files.entries,
     };
 
-    const json = std.json.stringifyAlloc(mercury_data.alloc, ret_json, .{}) catch return;
-    defer mercury_data.alloc.free(json);
+    const json = std.json.stringifyAlloc(mercury_state.alloc, ret_json, .{}) catch return;
+    defer mercury_state.alloc.free(json);
 
     r.sendJson(json) catch return;
 }

@@ -7,7 +7,7 @@ const storage = @import("storage.zig");
 const Group = @import("Group.zig");
 const File = @import("File.zig");
 
-const Data = @This();
+const State = @This();
 
 pub const GroupStore = storage.JsonFileStore(Group, true);
 pub const FileStore = storage.JsonFileStore(File, true);
@@ -17,7 +17,7 @@ data_path: []const u8,
 group_store: GroupStore,
 file_store: FileStore,
 
-pub fn init(alloc: Allocator, data: []const u8) !Data {
+pub fn init(alloc: Allocator, data: []const u8) !State {
     var data_dir = std.fs.cwd().makeOpenPath(data, .{}) catch |err| {
         log.err("failed to make path '{s}' with: '{any}'", .{ data, err });
         return err;
@@ -42,7 +42,7 @@ pub fn init(alloc: Allocator, data: []const u8) !Data {
     var file_store = try FileStore.init(alloc, &data_dir, data_path, "files.json");
     errdefer file_store.deinit();
 
-    return Data{
+    return State{
         .alloc = alloc,
         .data_path = data_path,
         .group_store = group_store,
@@ -50,7 +50,7 @@ pub fn init(alloc: Allocator, data: []const u8) !Data {
     };
 }
 
-pub fn deinit(self: *Data) void {
+pub fn deinit(self: *State) void {
     self.group_store.deinit();
     self.file_store.deinit();
     self.alloc.free(self.data_path);
