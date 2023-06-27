@@ -245,13 +245,13 @@ pub fn JsonFileStore(comptime T: type, comptime debug: bool) type {
             }
 
             var it = self.map.iterator();
-            it.index = @intCast(u32, above_index);
+            it.index = @intCast(above_index);
 
             var carry_value: ?LatestEntry = null;
             var carry_key: ?[36]u8 = null;
 
             while (it.next()) |entry| {
-                const index = @intCast(usize, it.index) - 1;
+                const index = @as(usize, it.index) - 1;
 
                 const next_value = entry.value_ptr.*;
                 const next_key = entry.key_ptr.*;
@@ -268,7 +268,7 @@ pub fn JsonFileStore(comptime T: type, comptime debug: bool) type {
                 carry_key = next_key;
 
                 if (index == move_index) {
-                    it.index = @intCast(u32, above_index);
+                    it.index = @as(u32, @intCast(above_index));
                     var top_entry = it.next() orelse unreachable;
 
                     top_entry.value_ptr.* = carry_value.?;
@@ -300,10 +300,10 @@ pub fn JsonFileStore(comptime T: type, comptime debug: bool) type {
             }
 
             var it = self.map.iterator();
-            it.index = @intCast(u32, move_index);
+            it.index = @as(u32, @intCast(move_index));
 
             while (it.next()) |entry| {
-                const index = @intCast(usize, it.index) - 1;
+                const index = @as(usize, @intCast(it.index)) - 1;
 
                 const next_value = entry.value_ptr.*;
                 const next_key = entry.key_ptr.*;
