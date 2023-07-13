@@ -3,6 +3,9 @@ const log = std.log;
 
 const Allocator = std.mem.Allocator;
 
+pub const File = @import("storage/File.zig");
+pub const Group = @import("storage/Group.zig");
+
 pub fn JsonFileStore(comptime T: type, comptime debug: bool) type {
     return struct {
         const Self = @This();

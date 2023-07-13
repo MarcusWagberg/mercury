@@ -4,13 +4,10 @@ const Allocator = std.mem.Allocator;
 
 const storage = @import("storage.zig");
 
-const Group = @import("Group.zig");
-const File = @import("File.zig");
-
 const State = @This();
 
-pub const GroupStore = storage.JsonFileStore(Group, true);
-pub const FileStore = storage.JsonFileStore(File, true);
+pub const GroupStore = storage.JsonFileStore(storage.Group, true);
+pub const FileStore = storage.JsonFileStore(storage.File, true);
 
 alloc: Allocator,
 data_path: []const u8,
