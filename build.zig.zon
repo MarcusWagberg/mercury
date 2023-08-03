@@ -3,16 +3,16 @@
     .version = "0.0.1",
 
     .dependencies = .{
-        // zig-clap bdb5853b678d68f342ec65b04a6785af522ca6c9
+        // zig-clap e01689cd98a5f090ca3252bd8b704a2c9953ee5f
         .clap = .{
-            .url = "https://github.com/Hejsil/zig-clap/archive/bdb5853b678d68f342ec65b04a6785af522ca6c9.tar.gz",
-            .hash = "12202af04ec78191f2018458a7be29f54e0d9118f7688e7a226857acf754d68b8473",
+            .url = "https://github.com/MarcusWagberg/zig-clap/archive/e01689cd98a5f090ca3252bd8b704a2c9953ee5f.tar.gz",
+            .hash = "1220f48518ce22882e102255ed3bcdb7aeeb4891f50b2cdd3bd74b5b2e24d3149ba2",
         },
 
-        // zap v0.1.8-pre
+        // zap v0.1.10-pre
         .zap = .{
-            .url = "https://github.com/zigzap/zap/archive/refs/tags/v0.1.8-pre.tar.gz",
-            .hash = "1220e30645c293c943dccc9d4394f7088679cf0969c63a7f4b23f72e375744123729",
+            .url = "https://github.com/zigzap/zap/archive/refs/tags/v0.1.10-pre.tar.gz",
+            .hash = "1220a645e8ae84064f3342609f65d1c97e23c292616f5d1040cdf314ca52d7643f8a",
         },
     },
 }

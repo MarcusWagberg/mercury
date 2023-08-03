@@ -9,7 +9,7 @@ pub const Group = @import("storage/Group.zig");
 pub fn JsonFileStore(comptime T: type, comptime debug: bool) type {
     return struct {
         const Self = @This();
-        const stringify_options = std.json.StringifyOptions{ .whitespace = .{} };
+        const stringify_options = std.json.StringifyOptions{ .whitespace = .indent_4 };
         const parse_options = std.json.ParseOptions{};
 
         const Latest = T.Latest;
