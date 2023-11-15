@@ -12,8 +12,6 @@ pub fn JsonFileStore(comptime T: type, comptime debug: bool) type {
         const stringify_options = std.json.StringifyOptions{ .whitespace = .indent_4 };
         const parse_options = std.json.ParseOptions{};
 
-        const Latest = T.Latest;
-
         const Meta = struct {
             version: u64,
             created: i128,
@@ -63,7 +61,8 @@ pub fn JsonFileStore(comptime T: type, comptime debug: bool) type {
             };
         }
 
-        pub const LatestEntry = Entry(Latest);
+        pub const LatestData = T.Latest;
+        pub const LatestEntry = Entry(LatestData);
 
         const LatestJsonFile = JsonFile(LatestEntry);
         const LatestList = List(LatestEntry);
@@ -95,7 +94,7 @@ pub fn JsonFileStore(comptime T: type, comptime debug: bool) type {
                     defer created.close();
 
                     const json_file = LatestJsonFile{
-                        .meta = .{ .version = Latest.version, .created = std.time.nanoTimestamp() },
+                        .meta = .{ .version = LatestData.version, .created = std.time.nanoTimestamp() },
                         .entries = &[_]LatestEntry{},
                     };
                     std.json.stringify(json_file, stringify_options, created.writer()) catch |inner_err| {
@@ -153,7 +152,7 @@ pub fn JsonFileStore(comptime T: type, comptime debug: bool) type {
             return return_list;
         }
 
-        pub fn create(self: *Self, data: Latest) !void {
+        pub fn create(self: *Self, data: LatestData) !void {
             var prng = std.rand.DefaultPrng.init(blk: {
                 var seed: u64 = undefined;
                 std.os.getrandom(std.mem.asBytes(&seed)) catch |err| {
@@ -206,7 +205,7 @@ pub fn JsonFileStore(comptime T: type, comptime debug: bool) type {
             };
         }
 
-        pub fn update(self: *Self, id: [36]u8, data: Latest) !void {
+        pub fn update(self: *Self, id: [36]u8, data: LatestData) !void {
             self.mutex.lock();
             defer self.mutex.unlock();
 
@@ -394,9 +393,9 @@ pub fn JsonFileStore(comptime T: type, comptime debug: bool) type {
                 return error.VersionParseFailed;
             };
 
-            if (Latest.version > 1) {
+            if (LatestData.version > 1) {
                 comptime var i = 2;
-                inline while (i <= Latest.version) : (i += 1) {
+                inline while (i <= LatestData.version) : (i += 1) {
                     const current_name = std.fmt.comptimePrint("V{d}", .{i});
                     const Current = @field(T, current_name);
 

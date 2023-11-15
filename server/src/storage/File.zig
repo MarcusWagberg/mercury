@@ -6,7 +6,9 @@ pub const V1 = struct {
 
     name: []const u8,
     ftype: []const u8,
-    group: [36]u8,
+    // if false attached to a group
+    attached_to_file: bool,
+    attached_to_id: [36]u8,
     uploaded: i128,
 
     pub fn free(self: *const Self, alloc: Allocator) void {
@@ -18,7 +20,8 @@ pub const V1 = struct {
         return Self{
             .name = alloc.dupe(u8, self.name) catch return null,
             .ftype = alloc.dupe(u8, self.ftype) catch return null,
-            .group = self.group,
+            .attached_to_file = self.attached_to_file,
+            .attached_to_id = self.attached_to_id,
             .uploaded = self.uploaded,
         };
     }
